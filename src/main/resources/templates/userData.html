@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+
+</head>
+<body align="center">
+<h3>СТРАНИЦА ПОЛЬЗОВАТЕЛЯ</h3>
+<hr>
+<body>
+<table border="1" , align="center">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>User Name</th>
+        <th>Address</th>
+        <th>Email</th>
+        <th>Role</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:object="${userD}">
+        <td th:text="${userD.getId()}"></td>
+        <td th:text="${userD.getUsername()}"></td>
+        <td th:text="${userD.getAddress()}"></td>
+        <td th:text="${userD.getEmail()}"></td>
+        <td th:text="${userD.getRoles()}"></td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<form name="logOut" th:action="@{/logout}" method="post" , align="center">
+    <input type="submit" value="LOGOUT">
+</form>
+</body>
+</html>
