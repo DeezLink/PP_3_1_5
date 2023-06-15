@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>User property</title>
+</head>
+
+<body>
+
+<h3>User Directory</h3>
+<hr>
+
+<p>User data</p>
+
+<form th:action="@{/admin/saveUser}" th:object="${user}" method="POST">
+
+    <input type="hidden" th:field="*{id}"/>
+
+    <input type="text" th:field="*{userName}" th:disabled="true" placeholder="login">
+    <br/><br/>
+    <input type="text" th:field="*{firstName}" th:disabled="true" placeholder="First name">
+    <br/><br/>
+    <input type="text" th:field="*{lastName}" th:disabled="true" placeholder="Last name">
+    <br/><br/>
+    <input type="text" th:field="*{email}" th:disabled="true" placeholder="Email">
+    <br/><br/>
+    <label for="roles">User roles:</label>
+    <br/>
+    <select id="roles" required multiple="multiple" name="roles" th:disabled="true">
+
+        <option th:each="role : ${user.roles}"
+                th:value="${{role.id}}"
+                th:text="${role.name}"></option>
+    </select>
+
+</form>
+
+<hr>
+
+<form action="#" th:action="@{/logout}" method="POST">
+    <input type="submit" value="Logout"/>
+
+</form>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+

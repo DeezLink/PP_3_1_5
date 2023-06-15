@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>User Directory</title>
+</head>
+
+<body align="center">
+
+<h3>Users Directory</h3>
+<hr>
+
+<table border="1" , align="center">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Login</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="tempUser : ${users}">
+        <td th:text="${tempUser.getId()}"></td>
+        <td th:text="${tempUser.userName}"/>
+        <td th:text="${tempUser.firstName}"/>
+        <td th:text="${tempUser.lastName}"/>
+        <td th:text="${tempUser.email}"/>
+
+        <td>
+
+            <form th:action="@{/admin/showFormForUpdate}" method="POST">
+                <input type="hidden" name="userId" th:value="${tempUser.id}"/>
+                <button type="submit">Update</button>
+            </form>
+
+            <form th:action="@{/admin/delete}" method="POST">
+                <input type="hidden" name="userId" th:value="${tempUser.id}"/>
+                <button type="submit">Delete</button>
+            </form>
+
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<hr>
+<form th:method="GET" th:action="@{/admin/showFormForAdd}">
+    <input type="submit" value="Add new USER">
+</form>
+<br>
+<form th:action="@{/logout}" method="POST">
+    <input type="submit" value="Logout"/>
+</form>
+
+</body>
+</html>

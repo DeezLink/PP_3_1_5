@@ -1,109 +1,84 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.Role;
-import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.entity.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Controller
-@RequestMapping(value = "/admin")
-
+@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public String showUsers(ModelMap model) {
-        model.addAttribute("users", userService.getUsers());
-        return "adminData";
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @GetMapping("/list")
+    public String listCustomers(Model theModel) {
+        List<User> theUsers = userService.getUsers();
+        theModel.addAttribute("users", theUsers);
+        return "list-users";
     }
 
-    @GetMapping(value = "/addUser")
-    public String addUser(Model model) {
-        User user = new User();
-        model.addAttribute("newUser", user);
-        return "newUser";
+    @GetMapping("/showFormForAdd")
+    public String showFormForAdd(Model theModel) {
+        User theUser = new User();
+        theModel.addAttribute("user", theUser);
+        theModel.addAttribute("roles", roleService.findAll());
+        return "user-form";
     }
 
-    @PostMapping(value = "/addUser")
-    public String createUser(@ModelAttribute("newUser") User user, HttpServletRequest request) {
-        Set<Role> roles = new HashSet<>();
-        String[] userRoles = request.getParameterValues("role1");
-
-        for (String roleId : userRoles) {
-            if (Long.parseLong(roleId) == 2L) {
-                roles.add(userService.getRole(2L));
+    @PostMapping("/saveUser")
+    public String saveUser(@ModelAttribute("user") User theUser, @RequestParam("roles") String[] roles) {
+        String encode = theUser.getPassword();
+        if (theUser.getId() != 0) { // update user
+            if (encode.isEmpty()) { //  password not changed
+                theUser.setPassword(userService.getUser(theUser.getId()).getPassword());
+            } else {
+                passwordChanged(theUser, encode);
             }
-            if (Long.parseLong(roleId) == 1L) {
-                roles.add(userService.getRole(1L));
-            }
+        } else { //new user
+            passwordChanged(theUser, encode);
         }
-        user.setRole(roles);
-        userService.save(user);
-        return "redirect:/admin";
-    }
 
-    @DeleteMapping(value = "/remove/{id}")
-    public String deleteUser(@PathVariable(name = "id") int id) {
-        userService.deleteUser(id);
-        return "redirect:/admin ";
-    }
-
-
-    @GetMapping(value = "/edit/{id}")
-    public String editUser(@PathVariable("id") int id, ModelMap model) {
-        model.addAttribute("user", userService.showUser(id));
-        model.addAttribute("allRoles", userService.arrayRoles());
-        return "editUser";
-    }
-
-    @PatchMapping("/edit/{id}")
-    public String update(@ModelAttribute("user") User user,
-                         @PathVariable("id") int id) {
-
-        Set<Role> role = userService.showUser(id).getRoles();
-        user.setRole(role);
-        userService.editUser(user);
-        return "redirect:/admin ";
-    }
-
-    @DeleteMapping(value = "/removeRole/{user_id}/{role_id}")
-    public String deleteUserRole(@PathVariable(name = "user_id") int userId,
-                                 @PathVariable(name = "role_id") int roleId) {
-        Set<Role> userRole = userService.showUser(userId).getRoles();
-        userRole = userRole.stream().filter(e -> e.getId() != roleId).collect(Collectors.toSet());
-        User user = userService.showUser(userId);
-        user.setRole(userRole);
-        userService.editUser(user);
-        return String.format("redirect:/admin/edit/%d", userId);
-    }
-
-    @PatchMapping("/addRole/{user_id}")
-    public String addRole(HttpServletRequest request, @PathVariable("user_id") int userId) {
-        String[] userRoles = request.getParameterValues("addRole");
-        if (userRoles[0].equals("1")) {
-            User user = userService.showUser(userId);
-            user.addRole(userService.getRole(1L));
-            userService.editUser(user);
-        } else if (userRoles[0].equals("2")) {
-            User user = userService.showUser(userId);
-            user.addRole(userService.getRole(2L));
-            userService.editUser(user);
-
+        theUser.getRoles().clear();
+        for (String r : roles) {
+            theUser.addRole(roleService.getRole(Integer.parseInt(r)));
         }
-        return String.format("redirect:/admin/edit/%d", userId);
+
+        userService.saveUser(theUser);
+        return "redirect:/admin/list";
     }
 
+    private void passwordChanged(User theUser, String encode) {
+        encode = passwordEncoder.encode(encode);
+        theUser.setPassword(encode);
+    }
+
+    @PostMapping("/showFormForUpdate")
+    public String showFormForUpdate(@RequestParam("userId") int theId,
+                                    Model theModel) {
+
+        User theUser = userService.getUser(theId);
+        theModel.addAttribute("user", theUser);
+        theModel.addAttribute("roles", roleService.findAll());
+        return "user-form";
+    }
+
+    @PostMapping("/delete")
+    public String deleteUser(@RequestParam("userId") int theId) {
+        userService.deleteUser(theId);
+        return "redirect:/admin/list";
+    }
 }

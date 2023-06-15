@@ -1,99 +1,55 @@
 package ru.kata.spring.boot_security.demo.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.kata.spring.boot_security.demo.dao.RoleDao;
-import ru.kata.spring.boot_security.demo.dao.UserDao;
-import ru.kata.spring.boot_security.demo.model.Role;
-import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.dao.UserRepository;
+import ru.kata.spring.boot_security.demo.entity.User;
 
-import javax.transaction.Transactional;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 
 @Service
-public class UserServiceImpl implements UserDetailsService, UserService {
+public class UserServiceImpl implements UserService {
 
-    private UserDao userDao;
-    private RoleDao roleDao;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private UserRepository userRepository;
 
-    public UserServiceImpl(UserDao userDao, RoleDao roleDao, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userDao = userDao;
-        this.roleDao = roleDao;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userDao.findByUserName(username);
-    }
-
-
-    public void save() {
-        Role user = new Role("ROLE_USER");
-        user.setId(1L);
-        Role admin = new Role("ROLE_ADMIN");
-        admin.setId(2L);
-        roleDao.addRole(user);
-        roleDao.addRole(admin);
-        User user1 = new User(bCryptPasswordEncoder.encode("admin"), "admin", "MSK", "admin@mail.ru");
-        Set<Role> user1Rols = new HashSet<>();
-        user1Rols.add(roleDao.getRole(2L));
-        user1.setRole(user1Rols);
-        userDao.save(user1);
-    }
-
-    @Override
-    public User showUser(int id) {
-        return userDao.showUser(id);
-    }
 
     @Override
     public List<User> getUsers() {
-        return userDao.getUsers();
+        return userRepository.findAll();
     }
 
     @Override
-    public void save(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        userDao.save(user);
+    public void saveUser(User theUser) {
+        userRepository.saveAndFlush(theUser);
     }
 
     @Override
-    public void editUser(User user) {
-        if (!bCryptPasswordEncoder.matches(user.getPassword(), showUser(user.getId()).getPassword())) {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    public User getUser(int id) {
+        Optional<User> result = userRepository.findById(id);
+        User theUser;
+        if (result.isPresent()) {
+            theUser = result.get();
+        } else {
+            // we didn't find the employee
+            throw new RuntimeException("Did not find user id - " + id);
         }
-        userDao.editUser(user);
-
+        return theUser;
     }
 
     @Override
     public void deleteUser(int id) {
-        userDao.deleteUser(id);
-
+        userRepository.deleteById(id);
     }
 
     @Override
-    public Role getRole(Long roleName) {
-        return roleDao.getRole(roleName);
-    }
-
-    @Override
-    public String decoding(String codingPass) {
-        BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder.encode(bc.encode(codingPass));
-    }
-
-    @Override
-    public String[] arrayRoles() {
-        return roleDao.arrayRole();
+    public User getUserByName(String s) {
+        return userRepository.getUserByName(s);
     }
 }
