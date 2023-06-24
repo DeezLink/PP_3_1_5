@@ -1,61 +1,121 @@
 <!DOCTYPE HTML>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <head>
-
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>User property</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Admin panel</title>
 </head>
+
 
 <body>
 
-<h3>User Directory</h3>
-<hr>
+<div class="row">
+    <div class="container-fluid">
+        <!-- HEADER -->
 
-<p>User data</p>
+        <header class="mb-2 bg-dark text-white">
 
-<form th:action="@{/admin/saveUser}" th:object="${user}" method="POST">
+            <div class="d-flex justify-content-between">
+                <div class=" mt-2">
+                    <span th:text="${#authentication.principal.email}"></span>
+                    <span>with roles:</span>
+                    <th:block th:each="r,authority : ${#authentication.getAuthorities()}">
+                    <span th:if="${r.getAuthority().startsWith('ROLE_')}"
+                          th:text="${r.getAuthority().replaceFirst('ROLE_', '')}"></span>
+                    </th:block>
 
-    <input type="hidden" th:field="*{id}"/>
+                </div>
+                <div>
+                    <!-- Add a logout button -->
+                    <form action="#" th:action="@{/logout}"
+                          method="POST">
+                        <input type="submit" value="Logout" class="btn btn-link mt-2"/>
+                    </form>
+                </div>
+            </div>
+        </header>
 
-    <input type="text" th:field="*{userName}" th:disabled="true" placeholder="login">
-    <br/><br/>
-    <input type="text" th:field="*{firstName}" th:disabled="true" placeholder="First name">
-    <br/><br/>
-    <input type="text" th:field="*{lastName}" th:disabled="true" placeholder="Last name">
-    <br/><br/>
-    <input type="text" th:field="*{email}" th:disabled="true" placeholder="Email">
-    <br/><br/>
-    <label for="roles">User roles:</label>
-    <br/>
-    <select id="roles" required multiple="multiple" name="roles" th:disabled="true">
+    </div>
 
-        <option th:each="role : ${user.roles}"
-                th:value="${{role.id}}"
-                th:text="${role.name}"></option>
-    </select>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="v-pills-user-tab" data-toggle="tab" href="#user-panel" role="tab"
+                   aria-controls="v-pills-user" aria-selected="true">User</a>
+            </div>
+        </div>
 
-</form>
 
-<hr>
+        <div class="col-md-10">
 
-<form action="#" th:action="@{/logout}" method="POST">
-    <input type="submit" value="Logout"/>
 
-</form>
+            <div class="tab-pane fade show active " id="user-panel" role="tabpanel" aria-labelledby="user-panel-tab">
+                <div>
+                    <h2>User information-page</h2>
+                </div>
 
+
+                <div class="container-fluid">
+                    <hr>
+                    <div class="col-md-11">
+                    </div>
+                    <table class="table table-striped">
+                        <h4>About user</h4>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Age</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr>
+                            <td th:text="${user.id}"/>
+                            <td th:text="${user.firstName}"/>
+                            <td th:text="${user.lastName}"/>
+                            <td th:text="${user.age}"/>
+                            <td th:text="${user.email}"/>
+                            <td>
+                                <th:block th:each="r,authority : ${#authentication.getAuthorities()}">
+                                      <span th:if="${r.getAuthority().startsWith('ROLE_')}"
+                                            th:text="${r.getAuthority().replaceFirst('ROLE_', '')}"></span>
+                                </th:block>
+                            </td>
+                            <!-- <td th:text="${principal_roles}"/>-->
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" th:src="@{/js/test.js}"></script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
