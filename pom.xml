@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zgrelle</groupId>
-	<artifactId>sping_boot_jpa_repositiory_thymeleaf_security</artifactId>
+	<artifactId>sping_boot_jpa_rest_repositiory_thymeleaf_security</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sping_boot_jpa_repositiory_thymeleaf_security</name>
 	<description>Demo project for Spring Boot</description>

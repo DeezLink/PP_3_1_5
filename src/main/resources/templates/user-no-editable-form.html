@@ -21,23 +21,16 @@
     <div class="container-fluid">
         <!-- HEADER -->
 
-        <header class="mb-2 bg-dark text-white">
+        <header class="p-3 mb-2 bg-dark text-white">
 
             <div class="d-flex justify-content-between">
-                <div class=" mt-2">
-                    <span th:text="${#authentication.principal.email}"></span>
-                    <span>with roles:</span>
-                    <th:block th:each="r,authority : ${#authentication.getAuthorities()}">
-                    <span th:if="${r.getAuthority().startsWith('ROLE_')}"
-                          th:text="${r.getAuthority().replaceFirst('ROLE_', '')}"></span>
-                    </th:block>
-
+                <div class="mt-2" id="header_text">
                 </div>
                 <div>
                     <!-- Add a logout button -->
                     <form action="#" th:action="@{/logout}"
                           method="POST">
-                        <input type="submit" value="Logout" class="btn btn-link mt-2"/>
+                        <input type="submit" value="Logout" class="btn btn-outline-primary mt-2"/>
                     </form>
                 </div>
             </div>
@@ -69,7 +62,7 @@
                     <hr>
                     <div class="col-md-11">
                     </div>
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="test_table">
                         <h4>About user</h4>
                         <thead>
                         <tr>
@@ -81,28 +74,11 @@
                             <th>Role</th>
                         </tr>
                         </thead>
-
-                        <tbody>
-
-                        <tr>
-                            <td th:text="${user.id}"/>
-                            <td th:text="${user.firstName}"/>
-                            <td th:text="${user.lastName}"/>
-                            <td th:text="${user.age}"/>
-                            <td th:text="${user.email}"/>
-                            <td>
-                                <th:block th:each="r,authority : ${#authentication.getAuthorities()}">
-                                      <span th:if="${r.getAuthority().startsWith('ROLE_')}"
-                                            th:text="${r.getAuthority().replaceFirst('ROLE_', '')}"></span>
-                                </th:block>
-                            </td>
-                            <!-- <td th:text="${principal_roles}"/>-->
-                        </tr>
+                        <tbody id="body_user_table">
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -113,9 +89,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
+<script
+        src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
-<script type="text/javascript" th:src="@{/js/test.js}"></script>
+<script type="text/javascript" th:src="@{/js/userInfo.js}"></script>
 </body>
 </html>

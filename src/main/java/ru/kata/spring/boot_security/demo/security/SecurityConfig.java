@@ -1,4 +1,4 @@
-package ru.kata.spring.boot_security.demo.configs;
+package ru.kata.spring.boot_security.demo.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,11 +30,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf()
-                .disable() //- попробуйте выяснить сами, что это даёт
+                .disable().cors().disable() //- попробуйте выяснить сами, что это даёт
                 .authorizeRequests()
-                .antMatchers("/admin/*").hasAnyRole("ADMIN")
+                .antMatchers("/adminAPI/*").hasAnyRole("ADMIN")
                 .antMatchers("/user/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/userAPI/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/resources/**").permitAll()
+                .antMatchers("/main").access("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
                 .and()
                 .formLogin().successHandler(successUserHandler)
                 .loginPage("/login")

@@ -1,11 +1,11 @@
 package ru.kata.spring.boot_security.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.dao.RoleRepository;
 import ru.kata.spring.boot_security.demo.entity.Role;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,7 +20,7 @@ public class RoleServiceImpl implements RoleService {
 
 
     @Override
-    public Collection<Role> findAll() {
+    public List<Role> findAll() {
         return roleRepository.findAll();
     }
 
@@ -31,6 +31,7 @@ public class RoleServiceImpl implements RoleService {
         if (result.isPresent()) {
             theRole = result.get();
         } else {
+
             throw new RuntimeException("Did not find user id - " + id);
         }
         return theRole;
